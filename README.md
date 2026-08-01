@@ -32,16 +32,45 @@ To develop offline (or in a sandbox without API access):
 USE_FIXTURES=1 npm run dev   # serves bundled 2013 F-150 demo data for any VIN
 ```
 
-## Deploying
+## Deploying (Vercel free tier, ~2 minutes)
 
-Built for the Vercel Hobby (free) tier: import the repo in Vercel and deploy —
-no environment variables required. Decode results cache for a day
-(`revalidate = 86400`), immutable data (vPIC/EPA/NCAP) for 30 days, and sticker
-PDFs at the CDN for 30 days, so shared links barely touch the upstream APIs.
+1. Go to [vercel.com/new](https://vercel.com/new) and sign in with GitHub.
+2. Import the **Vin-decoder** repository. Vercel auto-detects Next.js —
+   don't change any build settings, and **no environment variables are needed**.
+3. Click **Deploy**. Your app goes live at `<project-name>.vercel.app`,
+   shareable with anyone.
 
-If an OEM sticker endpoint breaks, disable it from the Vercel dashboard without
-a deploy: set `STICKER_DISABLED_PROVIDERS=gm` (ids: `ford`, `stellantis`, `gm`,
-`hyundai`). The UI degrades to "sticker not available" for that brand.
+Optional: for a custom URL, add a domain under Project → Settings → Domains.
+Optional: to use a conventionally named branch, rename the default branch to
+`main` first in GitHub under Settings → Branches (one click; Vercel follows
+the rename automatically).
+
+### After your first deploy — a 5-minute spot check
+
+Live API calls couldn't be exercised in the environment this app was built in,
+so verify once against real traffic. Grab VINs from any AutoTrader or
+Cars.com listing (VINs are shown on listing pages):
+
+- **A Ford and a Ram/Jeep (2015+):** decode should fill every panel, and the
+  window sticker button should open a real Monroney PDF.
+- **A Chevrolet and a Hyundai (2018+):** same check — these two sticker
+  adapters are marked *beta*. If one consistently fails, disable it (below).
+- **A BMW or Mercedes:** all data panels should fill; the sticker card should
+  show the "not publicly available" explanation, not an error.
+- **Something electric (Tesla, 2020+):** fuel economy panel should show MPGe.
+
+If a sticker adapter misbehaves, disable it without a redeploy: in Vercel →
+Project → Settings → Environment Variables, set
+`STICKER_DISABLED_PROVIDERS=gm` (ids: `ford`, `stellantis`, `gm`, `hyundai`,
+comma-separated). The UI degrades to "sticker not available" for that brand.
+
+### Why it stays free
+
+Decode results cache for a day (`revalidate = 86400`), immutable data
+(vPIC/EPA/NCAP) for 30 days, and sticker PDFs at the CDN for 30 days — so a
+link shared with 20 friends costs one upstream fetch, not twenty. All data
+sources are free, keyless government APIs, and the Vercel Hobby tier's limits
+are far beyond a personal tool's traffic.
 
 ## JSON API
 
