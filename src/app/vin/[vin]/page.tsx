@@ -91,7 +91,7 @@ export default async function VinPage({ params }: Props) {
         <StickerCard vehicle={vehicle} />
       </Suspense>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 *:min-w-0 md:grid-cols-2">
         <Suspense fallback={<PanelSkeleton icon={Fuel} title="EPA fuel economy" />}>
           <FuelEconomyPanel vehicle={vehicle} />
         </Suspense>
@@ -112,7 +112,7 @@ export default async function VinPage({ params }: Props) {
 
       <p className="text-muted-foreground text-xs">
         Developers: this decode is also available as JSON at{" "}
-        <code className="font-mono">/api/decode/{vehicle.vin}</code>
+        <code className="font-mono break-all">/api/decode/{vehicle.vin}</code>
       </p>
     </div>
   );

@@ -21,15 +21,19 @@ export function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <Card className="h-full gap-4">
+    <Card className="h-full min-w-0 gap-4">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Icon className="text-muted-foreground size-4" />
           {title}
         </CardTitle>
-        {description ? <CardDescription>{description}</CardDescription> : null}
+        {description ? (
+          <CardDescription className="[overflow-wrap:anywhere]">
+            {description}
+          </CardDescription>
+        ) : null}
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className="min-w-0">{children}</CardContent>
     </Card>
   );
 }

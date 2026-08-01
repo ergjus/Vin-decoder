@@ -12,6 +12,8 @@ const vpicDecode = {
       Model: "F-150",
       ModelYear: "2013",
       Trim: "XLT",
+      BasePrice: "$36,450",
+      Note: "Payload package includes upgraded rear axle and springs",
       Series: "F-Series",
       BodyClass: "Pickup",
       VehicleType: "TRUCK",

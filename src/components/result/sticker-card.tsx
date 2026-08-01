@@ -1,10 +1,10 @@
-import { FileText, FileX2 } from "lucide-react";
+import { ExternalLink, FileText, FileX2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { probeSticker } from "@/lib/stickers/probe";
-import { stickerAvailability } from "@/lib/stickers/registry";
+import { buildSheetLinks, stickerAvailability } from "@/lib/stickers/registry";
 import type { DecodedVehicle } from "@/lib/types";
 
 function Shell({
@@ -37,6 +37,32 @@ export async function StickerCard({ vehicle }: { vehicle: DecodedVehicle }) {
   const availability = stickerAvailability(vehicle.make, vehicle.year);
 
   if (availability.kind === "unsupported" || availability.kind === "too_old") {
+    const links =
+      availability.kind === "unsupported" ? buildSheetLinks(vehicle.make) : [];
+
+    if (links.length) {
+      return (
+        <Shell found={false}>
+          <div className="min-w-0">
+            <p className="font-medium">Paint, interior & factory options</p>
+            <p className="text-muted-foreground mt-0.5 text-sm">
+              {`${vehicle.makeDisplay} doesn't publish window stickers, but its factory build sheet lists every option — paint and interior colors included. These free community lookups usually retrieve it: copy the VIN above and paste it there. (Third-party sites, not affiliated.)`}
+            </p>
+          </div>
+          <div className="print-hidden flex shrink-0 flex-wrap gap-2">
+            {links.map((link) => (
+              <Button key={link.url} asChild variant="outline" size="sm">
+                <a href={link.url} target="_blank" rel="noopener noreferrer">
+                  {link.label}
+                  <ExternalLink className="size-3.5" />
+                </a>
+              </Button>
+            ))}
+          </div>
+        </Shell>
+      );
+    }
+
     return (
       <Shell found={false}>
         <div>

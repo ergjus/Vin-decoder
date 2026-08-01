@@ -43,7 +43,7 @@ export async function RecallsPanel({ vehicle }: { vehicle: DecodedVehicle }) {
                   </span>
                 </span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-3">
+              <AccordionContent className="space-y-3 [overflow-wrap:anywhere]">
                 {recall.summary ? <p>{recall.summary}</p> : null}
                 {recall.consequence ? (
                   <p>

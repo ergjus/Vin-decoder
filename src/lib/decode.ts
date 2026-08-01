@@ -97,17 +97,45 @@ const GROUP_SPECS: Array<{ title: string; fields: FieldSpec[] }> = [
   },
 ];
 
+// Fields that are metadata or already surfaced in the hero, never specs.
+const NON_SPEC_KEYS = new Set([
+  "Make", "Model", "ModelYear", "Trim", "Series",
+  "ErrorCode", "ErrorText", "AdditionalErrorText", "SuggestedVIN",
+  "PossibleValues", "VehicleDescriptor", "VIN",
+]);
+
+/** "PlantCompanyName" → "Plant Company Name", "GVWR" stays "GVWR". */
+function humanizeKey(key: string): string {
+  return key
+    .replace(/([a-z\d])([A-Z])/g, "$1 $2")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2");
+}
+
 function buildGroups(raw: Record<string, string>): SpecGroup[] {
   const groups: SpecGroup[] = [];
+  const usedKeys = new Set<string>(NON_SPEC_KEYS);
+
   for (const spec of GROUP_SPECS) {
     const items: SpecItem[] = [];
     for (const field of spec.fields) {
+      usedKeys.add(field.key);
       const value = raw[field.key];
       if (!value) continue;
       items.push({ label: field.label, value: field.unit ? value + field.unit : value });
     }
     if (items.length) groups.push({ title: spec.title, items });
   }
+
+  // Everything vPIC returned that the curated groups didn't claim — real
+  // decodes (especially European brands) carry fields worth showing.
+  const remaining: SpecItem[] = Object.entries(raw)
+    .filter(([key]) => !usedKeys.has(key))
+    .map(([key, value]) => ({ label: humanizeKey(key), value }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+  if (remaining.length) {
+    groups.push({ title: "Additional details", items: remaining });
+  }
+
   return groups;
 }
 

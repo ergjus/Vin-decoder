@@ -22,6 +22,36 @@ const UNSUPPORTED_REASONS: Record<string, string> = {
 const GENERIC_REASON =
   "This manufacturer doesn't make window stickers publicly retrievable by VIN.";
 
+export interface BuildSheetLink {
+  label: string;
+  url: string;
+}
+
+// Brands with no public Monroney access but whose factory build sheets
+// (paint, interior, option codes) free community sites can retrieve.
+const BUILD_SHEET_LINKS: Record<string, BuildSheetLink[]> = {
+  BMW: [
+    { label: "bmv.vin", url: "https://bmv.vin/decoder/bmw" },
+    { label: "VinDecoderz", url: "https://www.vindecoderz.com/EN/BMW" },
+  ],
+  "MERCEDES-BENZ": [
+    { label: "MBDecoder", url: "https://www.mbdecoder.com/" },
+    { label: "VinDecoderz", url: "https://www.vindecoderz.com/EN/Mercedes-Benz" },
+  ],
+  AUDI: [
+    { label: "VinDecoderz", url: "https://www.vindecoderz.com/EN/Audi" },
+    { label: "VIN Analytics", url: "https://vinanalytics.com/advanced-vin-decoder/" },
+  ],
+  PORSCHE: [
+    { label: "VIN Analytics", url: "https://vinanalytics.com/advanced-vin-decoder/" },
+    { label: "VinDecoderz", url: "https://www.vindecoderz.com/EN/Porsche" },
+  ],
+};
+
+export function buildSheetLinks(make: string): BuildSheetLink[] {
+  return BUILD_SHEET_LINKS[make.trim().toUpperCase()] ?? [];
+}
+
 export type StickerAvailability =
   | { kind: "provider"; provider: StickerProvider }
   | { kind: "too_old"; provider: StickerProvider; message: string }

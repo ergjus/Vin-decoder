@@ -28,14 +28,16 @@ export async function ComplaintsPanel({ vehicle }: { vehicle: DecodedVehicle }) 
       ) : (
         <ul className="space-y-4">
           {result.data.complaints.map((complaint) => (
-            <li key={complaint.odiNumber} className="text-sm">
-              <p className="text-muted-foreground text-xs">
+            <li key={complaint.odiNumber} className="min-w-0 text-sm">
+              <p className="text-muted-foreground text-xs [overflow-wrap:anywhere]">
                 {complaint.components}
                 {complaint.dateFiled ? ` · ${complaint.dateFiled}` : ""}
                 {complaint.crash ? " · involved a crash" : ""}
                 {complaint.fire ? " · involved a fire" : ""}
               </p>
-              <p className="mt-1 line-clamp-3 leading-relaxed">{complaint.summary}</p>
+              <p className="mt-1 line-clamp-3 leading-relaxed [overflow-wrap:anywhere]">
+                {complaint.summary}
+              </p>
             </li>
           ))}
         </ul>

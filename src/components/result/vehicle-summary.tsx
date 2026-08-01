@@ -15,7 +15,7 @@ export function VehicleSummary({ vehicle }: { vehicle: DecodedVehicle }) {
   return (
     <section className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
-        <h1 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+        <h1 className="text-3xl font-bold tracking-tight text-balance break-words sm:text-4xl">
           {vehicle.title || "Unknown vehicle"}
         </h1>
         <div className="text-muted-foreground mt-2 flex items-center gap-1 font-mono text-sm">

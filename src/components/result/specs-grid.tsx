@@ -12,7 +12,7 @@ export function SpecsGrid({ vehicle }: { vehicle: DecodedVehicle }) {
   return (
     <section>
       <h2 className="mb-4 text-xl font-semibold tracking-tight">Full specifications</h2>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 *:min-w-0 md:grid-cols-2">
         {vehicle.groups.map((group) => (
           <Card key={group.title} className="gap-4">
             <CardHeader>
@@ -26,7 +26,9 @@ export function SpecsGrid({ vehicle }: { vehicle: DecodedVehicle }) {
                     className="flex items-baseline justify-between gap-4 py-2 text-sm first:pt-0 last:pb-0"
                   >
                     <dt className="text-muted-foreground shrink-0">{item.label}</dt>
-                    <dd className="text-right font-medium">{item.value}</dd>
+                    <dd className="min-w-0 text-right font-medium [overflow-wrap:anywhere]">
+                      {item.value}
+                    </dd>
                   </div>
                 ))}
               </dl>
