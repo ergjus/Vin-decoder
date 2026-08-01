@@ -1,75 +1,35 @@
-import { ExternalLink, FileText, FileX2 } from "lucide-react";
+import { FileText } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { findBuildDataProvider } from "@/lib/build-data/registry";
 import { probeSticker } from "@/lib/stickers/probe";
 import { buildSheetLinks, stickerAvailability } from "@/lib/stickers/registry";
 import type { DecodedVehicle } from "@/lib/types";
-
-function Shell({
-  found,
-  children,
-}: {
-  found: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <Card className="py-4">
-      <CardContent className="flex flex-col gap-4 px-4 sm:flex-row sm:items-center">
-        <div
-          className={
-            "flex size-11 shrink-0 items-center justify-center rounded-lg " +
-            (found ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")
-          }
-        >
-          {found ? <FileText className="size-5" /> : <FileX2 className="size-5" />}
-        </div>
-        <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          {children}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+import { BuildDataCard } from "./build-data-card";
+import { BuildSheetLinksCard, StickerShell } from "./build-sheet-links-card";
 
 export async function StickerCard({ vehicle }: { vehicle: DecodedVehicle }) {
   const availability = stickerAvailability(vehicle.make, vehicle.year);
 
   if (availability.kind === "unsupported" || availability.kind === "too_old") {
-    const links =
-      availability.kind === "unsupported" ? buildSheetLinks(vehicle.make) : [];
-
-    if (links.length) {
-      return (
-        <Shell found={false}>
-          <div className="min-w-0">
-            <p className="font-medium">Paint, interior & factory options</p>
-            <p className="text-muted-foreground mt-0.5 text-sm">
-              {`${vehicle.makeDisplay} doesn't publish window stickers, but its factory build sheet lists every option — paint and interior colors included. These free community lookups usually retrieve it: copy the VIN above and paste it there. (Third-party sites, not affiliated.)`}
-            </p>
-          </div>
-          <div className="print-hidden flex shrink-0 flex-wrap gap-2">
-            {links.map((link) => (
-              <Button key={link.url} asChild variant="outline" size="sm">
-                <a href={link.url} target="_blank" rel="noopener noreferrer">
-                  {link.label}
-                  <ExternalLink className="size-3.5" />
-                </a>
-              </Button>
-            ))}
-          </div>
-        </Shell>
-      );
+    if (availability.kind === "unsupported") {
+      // Brands with a native build-data source (BMW/MINI via RealOEM) get the
+      // full factory options inline; the links card is its automatic fallback.
+      const provider = findBuildDataProvider(vehicle.make);
+      if (provider) return <BuildDataCard vehicle={vehicle} provider={provider} />;
+      if (buildSheetLinks(vehicle.make).length) {
+        return <BuildSheetLinksCard vehicle={vehicle} />;
+      }
     }
 
     return (
-      <Shell found={false}>
+      <StickerShell found={false}>
         <div>
           <p className="font-medium">Window sticker not available</p>
           <p className="text-muted-foreground mt-0.5 text-sm">{availability.message}</p>
         </div>
-      </Shell>
+      </StickerShell>
     );
   }
 
@@ -78,7 +38,7 @@ export async function StickerCard({ vehicle }: { vehicle: DecodedVehicle }) {
 
   if (probe === "found") {
     return (
-      <Shell found>
+      <StickerShell found>
         <div>
           <p className="flex items-center gap-2 font-medium">
             Original window sticker
@@ -96,13 +56,13 @@ export async function StickerCard({ vehicle }: { vehicle: DecodedVehicle }) {
             View sticker (PDF)
           </a>
         </Button>
-      </Shell>
+      </StickerShell>
     );
   }
 
   if (probe === "not_found") {
     return (
-      <Shell found={false}>
+      <StickerShell found={false}>
         <div>
           <p className="font-medium">No window sticker on file</p>
           <p className="text-muted-foreground mt-0.5 text-sm">
@@ -110,12 +70,12 @@ export async function StickerCard({ vehicle }: { vehicle: DecodedVehicle }) {
             for this one — common for older vehicles.
           </p>
         </div>
-      </Shell>
+      </StickerShell>
     );
   }
 
   return (
-    <Shell found={false}>
+    <StickerShell found={false}>
       <div>
         <p className="font-medium">Window sticker service unavailable</p>
         <p className="text-muted-foreground mt-0.5 text-sm">
@@ -128,6 +88,6 @@ export async function StickerCard({ vehicle }: { vehicle: DecodedVehicle }) {
           Try anyway
         </a>
       </Button>
-    </Shell>
+    </StickerShell>
   );
 }

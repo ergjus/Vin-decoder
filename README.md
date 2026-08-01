@@ -72,13 +72,27 @@ link shared with 20 friends costs one upstream fetch, not twenty. All data
 sources are free, keyless government APIs, and the Vercel Hobby tier's limits
 are far beyond a personal tool's traffic.
 
+## Factory build sheets (paint, interior, options)
+
+For BMW and MINI, the app fetches the factory build sheet natively from
+RealOEM (a long-stable public front-end for BMW's ETK parts catalog):
+production date, paint, upholstery, and the full factory option list. If the
+fetch or parse ever fails, the card automatically falls back to external
+lookup links — and `GET /api/build-data/{vin}` shows exactly what the parser
+saw, which makes fixing a layout change quick. Disable with
+`BUILD_DATA_DISABLED_PROVIDERS=realoem`.
+
+Mercedes-Benz, Audi, and Porsche have no comparably stable free source, so
+they get curated links to community datacard/build-sheet sites instead.
+
 ## JSON API
 
 Every decode is also available as JSON:
 
 ```
-GET /api/decode/{vin}     # decoded vehicle
-GET /api/sticker/{vin}    # window sticker PDF (404 JSON if unavailable)
+GET /api/decode/{vin}       # decoded vehicle
+GET /api/sticker/{vin}      # window sticker PDF (404 JSON if unavailable)
+GET /api/build-data/{vin}   # factory build sheet JSON (BMW/MINI)
 ```
 
 ## How the pieces fit
