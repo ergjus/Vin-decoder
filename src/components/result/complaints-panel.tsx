@@ -1,5 +1,6 @@
 import { MessageSquareWarning } from "lucide-react";
 
+import { ExpandableText } from "@/components/expandable-text";
 import { getComplaints } from "@/lib/sources/complaints";
 import type { DecodedVehicle } from "@/lib/types";
 import { Panel, PanelEmpty } from "./panel-shell";
@@ -35,9 +36,7 @@ export async function ComplaintsPanel({ vehicle }: { vehicle: DecodedVehicle }) 
                 {complaint.crash ? " · involved a crash" : ""}
                 {complaint.fire ? " · involved a fire" : ""}
               </p>
-              <p className="mt-1 line-clamp-3 leading-relaxed [overflow-wrap:anywhere]">
-                {complaint.summary}
-              </p>
+              <ExpandableText text={complaint.summary} className="mt-1" />
             </li>
           ))}
         </ul>

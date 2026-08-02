@@ -58,13 +58,13 @@ const recalls = {
       Manufacturer: "Ford Motor Company",
       NHTSACampaignNumber: "16V345000",
       ReportReceivedDate: "25/05/2016",
-      Component: "SERVICE BRAKES, HYDRAULIC",
+      Component: "SERVICE BRAKES, HYDRAULIC:FOUNDATION COMPONENTS:MASTER CYLINDER",
       Summary:
-        "Ford Motor Company (Ford) is recalling certain model year 2013-2014 F-150 vehicles manufactured August 1, 2013, to August 31, 2014. The brake master cylinder may leak brake fluid into the brake booster, reducing braking performance.",
+        "Ford Motor Company (Ford) is recalling certain model year 2013-2014 F-150 vehicles manufactured August 1, 2013, to August 31, 2014 at the Dearborn Truck Plant, and 2013-2014 F-150 vehicles manufactured June 1, 2013, to August 31, 2014 at the Kansas City Assembly Plant, equipped with 3.5L GTDI engines. In the affected vehicles, the brake master cylinder may leak brake fluid from the primary reservoir into the brake booster, reducing brake function in the front wheel circuit and increasing stopping distance.",
       Consequence:
-        "A loss of brake fluid can reduce the front brakes' effectiveness, lengthening the distance needed to stop the vehicle and increasing the risk of a crash.",
+        "A loss of brake fluid can reduce the front brakes' effectiveness, lengthening the distance needed to stop the vehicle and increasing the risk of a crash. Drivers may notice a change in brake pedal feel or travel, illumination of the brake warning light, or a low fluid level in the reservoir before performance degrades.",
       Remedy:
-        "Ford will notify owners, and dealers will replace the brake master cylinder, free of charge.",
+        "Ford will notify owners, and dealers will replace the brake master cylinder, free of charge. Vehicles that show signs of a leaking master cylinder will also receive a new brake booster.",
     },
     {
       Manufacturer: "Ford Motor Company",

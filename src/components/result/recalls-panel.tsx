@@ -1,5 +1,6 @@
 import { AlertTriangle } from "lucide-react";
 
+import { ExpandableText } from "@/components/expandable-text";
 import {
   Accordion,
   AccordionContent,
@@ -36,30 +37,30 @@ export async function RecallsPanel({ vehicle }: { vehicle: DecodedVehicle }) {
             <AccordionItem key={recall.campaignNumber || i} value={`recall-${i}`}>
               <AccordionTrigger className="gap-3">
                 <span className="flex min-w-0 flex-col gap-1 text-left">
-                  <span className="truncate">{recall.component || "Recall"}</span>
-                  <span className="text-muted-foreground text-xs font-normal">
+                  <span className="line-clamp-2 [overflow-wrap:anywhere]">
+                    {recall.component || "Recall"}
+                  </span>
+                  <span className="text-muted-foreground text-xs font-normal [overflow-wrap:anywhere]">
                     Campaign {recall.campaignNumber}
                     {recall.reportDate ? ` · ${recall.reportDate}` : ""}
                   </span>
                 </span>
               </AccordionTrigger>
-              <AccordionContent className="space-y-3 [overflow-wrap:anywhere]">
-                {recall.summary ? <p>{recall.summary}</p> : null}
+              <AccordionContent className="space-y-4">
+                {recall.summary ? (
+                  <ExpandableText text={recall.summary} className="text-muted-foreground" />
+                ) : null}
                 {recall.consequence ? (
-                  <p>
-                    <Badge variant="destructive" className="mr-2">
-                      Risk
-                    </Badge>
-                    {recall.consequence}
-                  </p>
+                  <div className="min-w-0 space-y-1.5">
+                    <Badge variant="destructive">Risk</Badge>
+                    <ExpandableText text={recall.consequence} />
+                  </div>
                 ) : null}
                 {recall.remedy ? (
-                  <p>
-                    <Badge variant="secondary" className="mr-2">
-                      Fix
-                    </Badge>
-                    {recall.remedy}
-                  </p>
+                  <div className="min-w-0 space-y-1.5">
+                    <Badge variant="secondary">Fix</Badge>
+                    <ExpandableText text={recall.remedy} />
+                  </div>
                 ) : null}
               </AccordionContent>
             </AccordionItem>
