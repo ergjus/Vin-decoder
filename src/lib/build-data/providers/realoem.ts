@@ -1,3 +1,5 @@
+import { unstable_cache } from "next/cache";
+
 import type { BuildData, BuildDataProvider, BuildDataResult } from "../types";
 import { extractCells, valueAfterLabel } from "../parse";
 
@@ -6,8 +8,22 @@ import { extractCells, valueAfterLabel } from "../parse";
 // 7 characters of the VIN. No login, and the page layout has been stable
 // for many years — which is why every "free BMW decoder" site uses this data.
 
-const BROWSER_UA =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
+// Full browser-shaped header set: RealOEM's WAF 403s bare fetches.
+const BROWSER_HEADERS: Record<string, string> = {
+  "user-agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+  accept:
+    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+  "accept-language": "en-US,en;q=0.9",
+  "sec-ch-ua": '"Chromium";v="126", "Not.A/Brand";v="8", "Google Chrome";v="126"',
+  "sec-ch-ua-mobile": "?0",
+  "sec-ch-ua-platform": '"Windows"',
+  "sec-fetch-dest": "document",
+  "sec-fetch-mode": "navigate",
+  "sec-fetch-site": "none",
+  "sec-fetch-user": "?1",
+  "upgrade-insecure-requests": "1",
+};
 
 const LABELS = {
   model: /^model$/i,
@@ -69,6 +85,58 @@ export function parseRealOemHtml(html: string, sourceUrl: string): BuildDataResu
   };
 }
 
+function candidateUrls(serial: string): string[] {
+  const s = encodeURIComponent(serial);
+  return [
+    `https://www.realoem.com/bmw/enUS/select?vin=${s}`,
+    `https://realoem.com/bmw/select.do?vin=${s}`,
+  ];
+}
+
+/**
+ * Try each RealOEM entry point in order. Successful and not-found outcomes
+ * are worth caching; transient failures throw so nothing sticks — the
+ * accumulated per-attempt report becomes the debug-endpoint error reason.
+ */
+async function fetchUncached(serial: string): Promise<BuildDataResult> {
+  const attempts: string[] = [];
+
+  for (const url of candidateUrls(serial)) {
+    const host = new URL(url).host;
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        headers: BROWSER_HEADERS,
+        cache: "no-store",
+        signal: AbortSignal.timeout(5_000),
+      });
+    } catch (err) {
+      attempts.push(`${host}: ${err instanceof Error ? err.name : "fetch failed"}`);
+      continue;
+    }
+    if (!res.ok) {
+      attempts.push(`${host}: HTTP ${res.status}`);
+      continue;
+    }
+
+    const parsed = parseRealOemHtml(await res.text(), url);
+    if (parsed.status === "error") {
+      attempts.push(`${host}: ${parsed.reason}`);
+      continue;
+    }
+    return parsed;
+  }
+
+  throw new Error(attempts.join("; ") || "no attempts ran");
+}
+
+const cachedFetch = unstable_cache(
+  // Only ok/not_found ever get here (errors throw), so a 30-day TTL is safe.
+  async (serial: string) => fetchUncached(serial),
+  ["build-data-realoem"],
+  { revalidate: 2_592_000 }
+);
+
 function demoBuildData(sourceUrl: string): BuildDataResult {
   return {
     status: "ok",
@@ -99,19 +167,11 @@ export const realoem: BuildDataProvider = {
   brands: ["BMW", "MINI"],
   async fetchBuildData(vin) {
     const serial = vin.slice(-7);
-    const url = `https://www.realoem.com/bmw/enUS/select?vin=${encodeURIComponent(serial)}`;
-
-    if (process.env.USE_FIXTURES === "1") return demoBuildData(url);
-
+    if (process.env.USE_FIXTURES === "1") {
+      return demoBuildData(candidateUrls(serial)[0]);
+    }
     try {
-      const res = await fetch(url, {
-        headers: { "user-agent": BROWSER_UA, accept: "text/html,*/*" },
-        signal: AbortSignal.timeout(8_000),
-        // A vehicle's build sheet is immutable — cache the page for 30 days.
-        next: { revalidate: 2_592_000 },
-      });
-      if (!res.ok) return { status: "error", reason: `HTTP ${res.status}` };
-      return parseRealOemHtml(await res.text(), url);
+      return await cachedFetch(serial);
     } catch (err) {
       return { status: "error", reason: err instanceof Error ? err.message : String(err) };
     }
