@@ -82,6 +82,14 @@ lookup links — and `GET /api/build-data/{vin}` shows exactly what the parser
 saw, which makes fixing a layout change quick. Disable with
 `BUILD_DATA_DISABLED_PROVIDERS=realoem`.
 
+**Hosting caveat:** RealOEM blocks datacenter IPs, so this feature 403s when
+served from Vercel (or any cloud host) — it works fine in local development
+from a home connection. To enable it in production, set
+`BUILD_DATA_PROXY_URL=http://user:pass@host:port` to a residential proxy
+(any provider; the cheap tiers are ~$5/month) in the Vercel dashboard. Only
+RealOEM fetches route through the proxy; without the variable, the card
+falls back to the external lookup links.
+
 Mercedes-Benz, Audi, and Porsche have no comparably stable free source, so
 they get curated links to community datacard/build-sheet sites instead.
 

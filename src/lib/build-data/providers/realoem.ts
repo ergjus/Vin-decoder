@@ -93,6 +93,39 @@ function candidateUrls(serial: string): string[] {
   ];
 }
 
+// RealOEM blocks datacenter IPs, so direct fetches from Vercel 403. When
+// BUILD_DATA_PROXY_URL is set (http://user:pass@host:port — a residential
+// proxy), RealOEM requests route through it; otherwise plain fetch, which
+// works from residential connections (local dev) but not from cloud hosts.
+interface MinimalResponse {
+  ok: boolean;
+  status: number;
+  text(): Promise<string>;
+}
+
+let proxyDispatcher: unknown | null = null;
+
+async function fetchPage(url: string): Promise<MinimalResponse> {
+  const proxyUrl = process.env.BUILD_DATA_PROXY_URL;
+  const init = {
+    headers: BROWSER_HEADERS,
+    signal: AbortSignal.timeout(8_000),
+  };
+
+  if (proxyUrl) {
+    // undici's own fetch: bypasses Next's fetch patching and accepts a
+    // dispatcher. Caching stays correct — unstable_cache wraps this layer.
+    const { fetch: undiciFetch, ProxyAgent } = await import("undici");
+    proxyDispatcher ??= new ProxyAgent(proxyUrl);
+    return undiciFetch(url, {
+      ...init,
+      dispatcher: proxyDispatcher as InstanceType<typeof ProxyAgent>,
+    });
+  }
+
+  return fetch(url, { ...init, cache: "no-store" });
+}
+
 /**
  * Try each RealOEM entry point in order. Successful and not-found outcomes
  * are worth caching; transient failures throw so nothing sticks — the
@@ -101,15 +134,13 @@ function candidateUrls(serial: string): string[] {
 async function fetchUncached(serial: string): Promise<BuildDataResult> {
   const attempts: string[] = [];
 
+  const viaProxy = process.env.BUILD_DATA_PROXY_URL ? " (via proxy)" : "";
+
   for (const url of candidateUrls(serial)) {
-    const host = new URL(url).host;
-    let res: Response;
+    const host = new URL(url).host + viaProxy;
+    let res: MinimalResponse;
     try {
-      res = await fetch(url, {
-        headers: BROWSER_HEADERS,
-        cache: "no-store",
-        signal: AbortSignal.timeout(5_000),
-      });
+      res = await fetchPage(url);
     } catch (err) {
       attempts.push(`${host}: ${err instanceof Error ? err.name : "fetch failed"}`);
       continue;
