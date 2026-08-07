@@ -40,12 +40,20 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col font-sans">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <header className="print-hidden border-b">
-            <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4">
+            <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between gap-4 px-4">
               <Link href="/" className="flex items-center gap-2 font-semibold">
                 <Car className="size-5" />
                 VIN Decoder
               </Link>
-              <ThemeToggle />
+              <nav className="flex items-center gap-1">
+                <Link
+                  href="/codes"
+                  className="text-muted-foreground hover:text-foreground rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+                >
+                  Option codes
+                </Link>
+                <ThemeToggle />
+              </nav>
             </div>
           </header>
           <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>

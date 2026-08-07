@@ -42,6 +42,9 @@ const BUILD_SHEET_LINKS: Record<string, BuildSheetLink[]> = {
     { label: "VinDecoderz", url: "https://www.vindecoderz.com/EN/Audi" },
     { label: "VIN Analytics", url: "https://vinanalytics.com/advanced-vin-decoder/" },
   ],
+  VOLKSWAGEN: [
+    { label: "VinDecoderz", url: "https://www.vindecoderz.com/EN/Volkswagen" },
+  ],
   PORSCHE: [
     { label: "VIN Analytics", url: "https://vinanalytics.com/advanced-vin-decoder/" },
     { label: "VinDecoderz", url: "https://www.vindecoderz.com/EN/Porsche" },

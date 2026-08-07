@@ -4,10 +4,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { findBuildDataProvider } from "@/lib/build-data/registry";
 import { probeSticker } from "@/lib/stickers/probe";
-import { buildSheetLinks, stickerAvailability } from "@/lib/stickers/registry";
+import { stickerAvailability } from "@/lib/stickers/registry";
 import type { DecodedVehicle } from "@/lib/types";
 import { BuildDataCard } from "./build-data-card";
-import { BuildSheetLinksCard, StickerShell } from "./build-sheet-links-card";
+import {
+  BuildSheetLinksCard,
+  hasBuildSheetHelp,
+  StickerShell,
+} from "./build-sheet-links-card";
 
 export async function StickerCard({ vehicle }: { vehicle: DecodedVehicle }) {
   const availability = stickerAvailability(vehicle.make, vehicle.year);
@@ -18,7 +22,7 @@ export async function StickerCard({ vehicle }: { vehicle: DecodedVehicle }) {
       // full factory options inline; the links card is its automatic fallback.
       const provider = findBuildDataProvider(vehicle.make);
       if (provider) return <BuildDataCard vehicle={vehicle} provider={provider} />;
-      if (buildSheetLinks(vehicle.make).length) {
+      if (hasBuildSheetHelp(vehicle.make)) {
         return <BuildSheetLinksCard vehicle={vehicle} />;
       }
     }
