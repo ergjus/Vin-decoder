@@ -112,7 +112,8 @@ export default async function VinPage({ params }: Props) {
 
       <p className="text-muted-foreground text-xs">
         Developers: this decode is also available as JSON at{" "}
-        <code className="font-mono break-all">/api/decode/{vehicle.vin}</code>
+        <code className="font-mono break-all">/api/decode/{vehicle.vin}</code> or Markdown
+        at <code className="font-mono break-all">/api/decode/{vehicle.vin}/markdown</code>
       </p>
     </div>
   );

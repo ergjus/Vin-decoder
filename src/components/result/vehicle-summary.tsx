@@ -1,4 +1,5 @@
 import { CopyButton } from "@/components/copy-button";
+import { CopyLlmButton } from "@/components/copy-llm-button";
 import { PrintButton } from "@/components/print-button";
 import { ShareButton } from "@/components/share-button";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +33,8 @@ export function VehicleSummary({ vehicle }: { vehicle: DecodedVehicle }) {
           </div>
         ) : null}
       </div>
-      <div className="print-hidden flex shrink-0 gap-2">
+      <div className="print-hidden flex shrink-0 flex-wrap gap-2">
+        <CopyLlmButton vin={vehicle.vin} />
         <ShareButton title={vehicle.title} />
         <PrintButton />
       </div>
