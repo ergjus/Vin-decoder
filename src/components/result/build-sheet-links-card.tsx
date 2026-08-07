@@ -1,19 +1,9 @@
-import Link from "next/link";
-import { ExternalLink, FileText, FileX2, ListChecks } from "lucide-react";
+import { ExternalLink, FileText, FileX2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { buildSheetLinks } from "@/lib/stickers/registry";
 import type { DecodedVehicle } from "@/lib/types";
-
-const CODE_DECODER_BRAND: Record<string, string> = {
-  BMW: "bmw",
-  MINI: "bmw",
-  AUDI: "vag",
-  VOLKSWAGEN: "vag",
-  PORSCHE: "vag",
-  "MERCEDES-BENZ": "mercedes",
-};
 
 export function StickerShell({
   found,
@@ -41,17 +31,10 @@ export function StickerShell({
   );
 }
 
-export function hasBuildSheetHelp(make: string): boolean {
-  return (
-    buildSheetLinks(make).length > 0 ||
-    Boolean(CODE_DECODER_BRAND[make.trim().toUpperCase()])
-  );
-}
-
 /** External community build-sheet lookups for brands we can't fetch natively. */
 export function BuildSheetLinksCard({ vehicle }: { vehicle: DecodedVehicle }) {
   const links = buildSheetLinks(vehicle.make);
-  if (!hasBuildSheetHelp(vehicle.make)) return null;
+  if (!links.length) return null;
 
   return (
     <StickerShell found={false}>
@@ -62,14 +45,6 @@ export function BuildSheetLinksCard({ vehicle }: { vehicle: DecodedVehicle }) {
         </p>
       </div>
       <div className="print-hidden flex shrink-0 flex-wrap gap-2">
-        {CODE_DECODER_BRAND[vehicle.make.toUpperCase()] ? (
-          <Button asChild size="sm">
-            <Link href={`/codes?brand=${CODE_DECODER_BRAND[vehicle.make.toUpperCase()]}`}>
-              <ListChecks className="size-3.5" />
-              Decode option codes
-            </Link>
-          </Button>
-        ) : null}
         {links.map((link) => (
           <Button key={link.url} asChild variant="outline" size="sm">
             <a href={link.url} target="_blank" rel="noopener noreferrer">

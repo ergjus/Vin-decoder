@@ -93,17 +93,6 @@ falls back to the external lookup links.
 Mercedes-Benz, Audi, and Porsche have no comparably stable free source, so
 they get curated links to community datacard/build-sheet sites instead.
 
-## Option code decoder (`/codes`)
-
-Every German car carries a sticker listing its factory options as short
-codes — BMW SA codes (trunk/door pillar), Audi/VW/Porsche PR codes (vehicle
-data label in the trunk and service booklet), and Mercedes datacard codes.
-The `/codes` page decodes them instantly from bundled community-compiled
-dictionaries (`src/lib/option-codes/data/`) — fully offline, no API, no
-gatekeeper. Unknown codes link out to community databases. This is the
-free-forever complement to the VIN-based build sheet: the codes come off
-the car itself.
-
 ## JSON API
 
 Every decode is also available as JSON:
