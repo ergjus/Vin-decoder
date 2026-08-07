@@ -1,6 +1,6 @@
 # VIN Decoder
 
-A free, ad-free VIN decoder for US-market vehicles. Enter (or scan) a 17-character
+I've been trying to find a good used car for a while now, and as I was searching I wanted to run VIN numbers and get back information about the car. Almost all VIN decoders I could find either didn't work, had too many ads, were behind paywalls, or were super slow. So I decided to build this: a free, ad-free VIN decoder for US-market vehicles. Enter (or scan) a 17-character
 VIN and get:
 
 - **Full factory specs** — engine, drivetrain, body, assembly plant, safety
